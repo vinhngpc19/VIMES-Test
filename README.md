@@ -7,6 +7,9 @@ A new Flutter project.
 Flutter Version
 Flutter 3.27.0 (stable channel)
 
+This project uses Firebase Firestore as the database
+[Stock In App](Capture.PNG)
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
