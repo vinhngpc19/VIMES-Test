@@ -1,6 +1,7 @@
 import 'package:vimes_test/data/models/stock_in_item_model.dart';
 
 class StockInModel {
+  final String? id;
   String? unit;
   String? department;
   String? stockInDate;
@@ -17,55 +18,57 @@ class StockInModel {
   String? stockInAdress;
   //
   List<StockInItemModel>? items;
+  int? totalMoney;
   //
   String? stringTotalMoney;
   String? referenceNumber;
   String? signaturePadString;
 
   StockInModel({
-    required this.unit,
-    required this.department,
-    required this.stockInDate,
-    required this.stockInNumber,
-    required this.debitNumber,
-    required this.creditNumber,
-    required this.deliverName,
-    required this.byName,
-    required this.byNumber,
-    required this.byDate,
-    required this.byOwner,
-    required this.stockInAt,
-    required this.stockInAdress,
-    //
-    required this.items,
-    //
+    this.id,
+    this.unit,
+    this.department,
+    this.stockInDate,
+    this.stockInNumber,
+    this.debitNumber,
+    this.creditNumber,
+    this.deliverName,
+    this.byName,
+    this.byNumber,
+    this.byDate,
+    this.byOwner,
+    this.stockInAt,
+    this.stockInAdress,
+    this.items,
     this.stringTotalMoney,
     this.referenceNumber,
-    required this.signaturePadString,
+    this.signaturePadString,
+    this.totalMoney,
   });
 
   factory StockInModel.fromJson(Map<String, dynamic> json) {
     return StockInModel(
-      unit: json['unit'],
-      department: json['department'],
-      stockInDate: json['stockInDate'],
-      stockInNumber: json['stockInNumber'],
-      debitNumber: json['debitNumber'],
-      creditNumber: json['creditNumber'],
-      deliverName: json['deliverName'],
-      byName: json['byName'],
-      byNumber: json['byNumber'],
-      byDate: json['byDate'],
-      byOwner: json['byOwner'],
-      stockInAt: json['stockInAt'],
-      stockInAdress: json['stockInAdress'],
+      id: json['id'] as String?,
+      unit: json['unit'] as String?,
+      department: json['department'] as String?,
+      stockInDate: json['stockInDate'] as String?,
+      stockInNumber: json['stockInNumber'] as String?,
+      debitNumber: json['debitNumber'] as int?,
+      creditNumber: json['creditNumber'] as String?,
+      deliverName: json['deliverName'] as String?,
+      byName: json['byName'] as String?,
+      byNumber: json['byNumber'] as String?,
+      byDate: json['byDate'] as String?,
+      byOwner: json['byOwner'] as String?,
+      stockInAt: json['stockInAt'] as String?,
+      stockInAdress: json['stockInAdress'] as String?,
       items: (json['items'] as List<dynamic>?)
-          ?.map(
-              (item) => StockInItemModel.fromJson(item as Map<String, dynamic>))
+          ?.map((e) => StockInItemModel.fromJson(e as Map<String, dynamic>))
           .toList(),
-      stringTotalMoney: json['stringTotalMoney'],
-      referenceNumber: json['referenceNumber'],
-      signaturePadString: json['signaturePadString'],
+      stringTotalMoney: json['stringTotalMoney'] as String?,
+      referenceNumber: json['referenceNumber'] as String?,
+      signaturePadString: json['signaturePadString'] as String?,
+      totalMoney: json['totalMoney'] as int?,
     );
   }
 
@@ -84,6 +87,7 @@ class StockInModel {
       'byOwner': byOwner,
       'stockInAt': stockInAt,
       'stockInAdress': stockInAdress,
+      'totalMoney': totalMoney,
       'items': items?.map((item) => item.toJson()).toList(),
       'stringTotalMoney': stringTotalMoney,
       'referenceNumber': referenceNumber,

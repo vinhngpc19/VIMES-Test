@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import 'package:vimes_test/pages/home/home_notifier.dart';
 import 'package:vimes_test/pages/home/home_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -20,14 +22,17 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'VIMES Test',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00A780)),
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (_) => HomeNotifier(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'VIMES Test',
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF00A780)),
+          useMaterial3: true,
+        ),
+        home: const HomePage(),
       ),
-      home: const HomePage(),
     );
   }
 }

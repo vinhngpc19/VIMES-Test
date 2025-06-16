@@ -5,6 +5,9 @@ import 'dart:ui' as ui;
 import 'package:vimes_test/data/models/stock_in_model.dart';
 import 'package:vimes_test/data/models/stock_in_item_model.dart';
 import 'package:vimes_test/services/firebase_service.dart';
+import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'package:vimes_test/pages/home/home_notifier.dart';
 
 class StockInNotifier extends ChangeNotifier {
   final formKey = GlobalKey<FormState>();
@@ -22,7 +25,11 @@ class StockInNotifier extends ChangeNotifier {
     }
   ];
 
+  final firebaseService = FirebaseService();
+
   List<num> itemTotals = [0];
+
+  bool isLoading = false;
 
   final TextEditingController unitController = TextEditingController();
   final TextEditingController departmentController = TextEditingController();
@@ -46,6 +53,30 @@ class StockInNotifier extends ChangeNotifier {
   bool isFirstValidate = false;
 
   ui.Image? signatureImage;
+
+  final FocusNode unitFocusNode = FocusNode();
+  final FocusNode departmentFocusNode = FocusNode();
+  final FocusNode stockInNumberFocusNode = FocusNode();
+  final FocusNode debitNumberFocusNode = FocusNode();
+  final FocusNode creditNumberFocusNode = FocusNode();
+  final FocusNode deliverNameFocusNode = FocusNode();
+  final FocusNode byNameFocusNode = FocusNode();
+  final FocusNode byNumberFocusNode = FocusNode();
+  final FocusNode byOwnerFocusNode = FocusNode();
+  final FocusNode stockInAtFocusNode = FocusNode();
+  final FocusNode stockInAdressFocusNode = FocusNode();
+
+  List<Map<String, FocusNode>> itemFocusNodes = [
+    {
+      'name': FocusNode(),
+      'code': FocusNode(),
+      'unit': FocusNode(),
+      'docQuantity': FocusNode(),
+      'quantity': FocusNode(),
+      'price': FocusNode(),
+    }
+  ];
+  final ScrollController scrollController = ScrollController();
 
   StockInNotifier() {
     _setupListenPriceAndQuanChange();
@@ -120,6 +151,14 @@ class StockInNotifier extends ChangeNotifier {
       'quantity': TextEditingController(),
       'price': TextEditingController(),
     });
+    itemFocusNodes.add({
+      'name': FocusNode(),
+      'code': FocusNode(),
+      'unit': FocusNode(),
+      'docQuantity': FocusNode(),
+      'quantity': FocusNode(),
+      'price': FocusNode(),
+    });
     itemTotals.add(0);
 
     final index = itemControllers.length - 1;
@@ -137,8 +176,11 @@ class StockInNotifier extends ChangeNotifier {
       final listItemKeys = itemControllers.last.keys.toList();
       for (final key in listItemKeys) {
         itemControllers.last[key]?.dispose();
+        itemFocusNodes.last[key]?.dispose();
       }
+
       itemControllers.removeLast();
+      itemFocusNodes.removeLast();
       itemTotals.removeLast();
       notifyListeners();
     }
@@ -149,10 +191,120 @@ class StockInNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
-  void sendData() async {
-    isFirstValidate = true;
+  num convertToNum(String? value) {
+    if (value == null || value.isEmpty) return 0;
+    String intValue = value.replaceAll('.', '').replaceAll(' ', '');
+    return num.tryParse(intValue) ?? 0;
+  }
+
+  String formatPrice(num? value) {
+    if (value == null) return '0';
+    String text = value.round().toString();
+    final chars = text.split('');
+    String newText = '';
+    for (int i = 0; i < chars.length; i++) {
+      if (i > 0 && (chars.length - i) % 3 == 0) {
+        newText += '.';
+      }
+      newText += chars[i];
+    }
+    return newText;
+  }
+
+  void setSignatureImage(ui.Image? image) {
+    signatureImage = image;
     notifyListeners();
-    if (formKey.currentState!.validate() && hasSignature) {
+  }
+
+  bool _validation() {
+    if (!isFirstValidate) {
+      isFirstValidate = true;
+      notifyListeners();
+    }
+
+    if (validateUnit(unitController.text.trim()) != null) {
+      unitFocusNode.requestFocus();
+      return false;
+    } else if (validateDepartment(departmentController.text.trim()) != null) {
+      departmentFocusNode.requestFocus();
+      return false;
+    } else if (validateStockInNumber(stockInNumberController.text.trim()) !=
+        null) {
+      stockInNumberFocusNode.requestFocus();
+      return false;
+    } else if (validateDebitNumber(debitNumberController.text.trim()) != null) {
+      debitNumberFocusNode.requestFocus();
+      return false;
+    } else if (validateCreditNumber(creditNumberController.text.trim()) !=
+        null) {
+      creditNumberFocusNode.requestFocus();
+      return false;
+    } else if (validateDeliverName(deliverNameController.text.trim()) != null) {
+      deliverNameFocusNode.requestFocus();
+      return false;
+    } else if (validateByName(byNameController.text.trim()) != null) {
+      byNameFocusNode.requestFocus();
+      return false;
+    } else if (validateByNumber(byNumberController.text.trim()) != null) {
+      byNumberFocusNode.requestFocus();
+      return false;
+    } else if (validateByOwner(byOwnerController.text.trim()) != null) {
+      byOwnerFocusNode.requestFocus();
+      return false;
+    } else if (validateStockInAt(stockInAtController.text.trim()) != null) {
+      stockInAtFocusNode.requestFocus();
+      return false;
+    } else if (validateStockInAdress(stockInAdressController.text.trim()) !=
+        null) {
+      stockInAdressFocusNode.requestFocus();
+      return false;
+    }
+
+    for (int i = 0; i < itemControllers.length; i++) {
+      final controller = itemControllers[i];
+      final focusNode = itemFocusNodes[i];
+
+      if (controller['name']?.text.trim().isEmpty ?? true) {
+        focusNode['name']?.requestFocus();
+        return false;
+      } else if (controller['code']?.text.trim().isEmpty ?? true) {
+        focusNode['code']?.requestFocus();
+        return false;
+      } else if (controller['unit']?.text.trim().isEmpty ?? true) {
+        focusNode['unit']?.requestFocus();
+        return false;
+      } else if (controller['quantity']?.text.trim().isEmpty ?? true) {
+        focusNode['quantity']?.requestFocus();
+        return false;
+      } else if (controller['price']?.text.trim().isEmpty ?? true) {
+        focusNode['price']?.requestFocus();
+        return false;
+      }
+    }
+
+    if (!hasSignature) {
+      scrollController.jumpTo(scrollController.position.maxScrollExtent);
+      return false;
+    }
+    return formKey.currentState!.validate();
+  }
+
+  void sendData(BuildContext context) async {
+    if (_validation()) {
+      isLoading = true;
+      notifyListeners();
+      String? signatureBase64;
+      if (signatureImage != null) {
+        final byteData =
+            await signatureImage!.toByteData(format: ui.ImageByteFormat.png);
+        if (byteData != null) {
+          signatureBase64 = base64Encode(byteData.buffer.asUint8List());
+        }
+      }
+
+      final totalMoney =
+          itemTotals.fold<num>(0, (sum, item) => sum + item).toInt();
+
       final stockIn = StockInModel(
         unit: unitController.text.trim(),
         department: departmentController.text.trim(),
@@ -183,42 +335,31 @@ class StockInNotifier extends ChangeNotifier {
         }).toList(),
         stringTotalMoney: stringTotalMoneyController.text.trim(),
         referenceNumber: referenceNumberController.text.trim(),
-        signaturePadString: null,
+        signaturePadString: signatureBase64,
+        totalMoney: totalMoney,
       );
-
-      // Gửi dữ liệu lên Firestore
-      final firebaseService = FirebaseService();
       try {
         await firebaseService.addStockIn(stockIn);
-        print('Dữ liệu đã được gửi lên Firestore thành công.');
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Dữ liệu đã được gửi thành công.'),
+            ),
+          );
+          Navigator.pop(context);
+          context.read<HomeNotifier>().loadStockIns();
+        }
       } catch (e) {
-        print('Lỗi khi gửi dữ liệu lên Firestore: $e');
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Gửi thất bại.'),
+            ),
+          );
+        }
       }
+      isLoading = false;
+      notifyListeners();
     }
-  }
-
-  num convertToNum(String? value) {
-    if (value == null || value.isEmpty) return 0;
-    String intValue = value.replaceAll('.', '').replaceAll(' ', '');
-    return num.tryParse(intValue) ?? 0;
-  }
-
-  String formatPrice(num? value) {
-    if (value == null) return '0';
-    String text = value.round().toString();
-    final chars = text.split('');
-    String newText = '';
-    for (int i = 0; i < chars.length; i++) {
-      if (i > 0 && (chars.length - i) % 3 == 0) {
-        newText += '.';
-      }
-      newText += chars[i];
-    }
-    return newText;
-  }
-
-  void setSignatureImage(ui.Image? image) {
-    signatureImage = image;
-    notifyListeners();
   }
 }

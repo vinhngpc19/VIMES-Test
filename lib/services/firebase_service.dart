@@ -16,10 +16,11 @@ class FirebaseService {
   Future<List<StockInModel>> getAllStockIns() async {
     try {
       QuerySnapshot snapshot = await _stockInsCollection.get();
-      return snapshot.docs
-          .map((doc) =>
-              StockInModel.fromJson(doc.data() as Map<String, dynamic>))
-          .toList();
+      return snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        data['id'] = doc.id;
+        return StockInModel.fromJson(data);
+      }).toList();
     } catch (e) {
       throw Exception('Lỗi: $e');
     }
