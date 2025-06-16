@@ -7,8 +7,8 @@ A new Flutter project.
 Flutter Version
 Flutter 3.27.0 (stable channel)
 
-This project uses Firebase Firestore as the database
-[Stock In App](Capture.PNG)
+This project uses Firebase Firestore as the database, here is an image of stock-in collection in Firestore Console:
+[Stock In App](https://raw.githubusercontent.com/vinhngpc19/VIMES-Test/refs/heads/master/Capture.PNG)
 
 ## Getting Started
 
