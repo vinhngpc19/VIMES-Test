@@ -54,7 +54,7 @@ class _StockInInputItemState extends State<StockInInputItem> {
                           minLines: 3,
                           maxLines: 3,
                           validator: _validateRequired,
-                          currentNode: notifier.itemFocusNodes[widget.index]
+                          focusNode: notifier.itemFocusNodes[widget.index]
                               ['name'],
                         ),
                         CustomInputText(
@@ -63,7 +63,7 @@ class _StockInInputItemState extends State<StockInInputItem> {
                           controller: widget.mapController['code'] ??
                               TextEditingController(),
                           validator: _validateRequired,
-                          currentNode: notifier.itemFocusNodes[widget.index]
+                          focusNode: notifier.itemFocusNodes[widget.index]
                               ['code'],
                         ),
                         CustomInputText(
@@ -72,7 +72,7 @@ class _StockInInputItemState extends State<StockInInputItem> {
                           controller: widget.mapController['unit'] ??
                               TextEditingController(),
                           validator: _validateRequired,
-                          currentNode: notifier.itemFocusNodes[widget.index]
+                          focusNode: notifier.itemFocusNodes[widget.index]
                               ['unit'],
                         ),
                         Padding(
@@ -108,7 +108,7 @@ class _StockInInputItemState extends State<StockInInputItem> {
                                                 RegExp(r'[0-9.]')),
                                           ],
                                           textInputType: TextInputType.number,
-                                          currentNode: notifier
+                                          focusNode: notifier
                                                   .itemFocusNodes[widget.index]
                                               ['docQuantity'],
                                         )),
@@ -127,7 +127,7 @@ class _StockInInputItemState extends State<StockInInputItem> {
                                               RegExp(r'[0-9.]')),
                                         ],
                                         textInputType: TextInputType.number,
-                                        currentNode: notifier
+                                        focusNode: notifier
                                                 .itemFocusNodes[widget.index]
                                             ['quantity'],
                                       ),
@@ -148,7 +148,7 @@ class _StockInInputItemState extends State<StockInInputItem> {
                             ThousandsInputFormatter(),
                           ],
                           textInputType: TextInputType.number,
-                          currentNode: notifier.itemFocusNodes[widget.index]
+                          focusNode: notifier.itemFocusNodes[widget.index]
                               ['price'],
                         ),
                         Padding(

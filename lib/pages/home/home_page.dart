@@ -37,54 +37,59 @@ class _HomePageState extends State<HomePage> {
           if (homeNotifier.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          return ListView.builder(
-            itemCount: homeNotifier.stockIns.length,
-            itemBuilder: (context, index) {
-              final stockIn = homeNotifier.stockIns[index];
-              return GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ChangeNotifierProvider(
-                                create: (_) => DetailNotifier(),
-                                child: DetailPage(id: stockIn.id!),
-                              )),
-                    );
-                  },
-                  child: Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          stockIn.stockInAt ?? '',
-                          maxLines: 2,
-                          style: const TextStyle(
-                            overflow: TextOverflow.ellipsis,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          stockIn.byDate ?? '',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ));
+          return RefreshIndicator(
+            onRefresh: () async {
+              await homeNotifier.loadStockIns();
             },
+            child: ListView.builder(
+              itemCount: homeNotifier.stockIns.length,
+              itemBuilder: (context, index) {
+                final stockIn = homeNotifier.stockIns[index];
+                return GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ChangeNotifierProvider(
+                                  create: (_) => DetailNotifier(),
+                                  child: DetailPage(id: stockIn.id!),
+                                )),
+                      );
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            stockIn.stockInAt ?? '',
+                            maxLines: 2,
+                            style: const TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            stockIn.byDate ?? '',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ));
+              },
+            ),
           );
         },
       ),

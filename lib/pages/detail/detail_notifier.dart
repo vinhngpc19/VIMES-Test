@@ -14,7 +14,7 @@ class DetailNotifier extends ChangeNotifier {
     try {
       stockIn = await _firebaseService.getStockInById(id);
     } catch (e) {
-      print('$e');
+      throw Exception('Failed to load stock in: $e');
     }
 
     isLoading = false;

@@ -15,7 +15,7 @@ class HomeNotifier extends ChangeNotifier {
     try {
       stockIns = await _firebaseService.getAllStockIns();
     } catch (e) {
-      print('$e');
+      throw Exception('Failed to load stock ins: $e');
     }
     isLoading = false;
     notifyListeners();
